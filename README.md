@@ -11,7 +11,7 @@ pip install git+https://github.com/Darel13712/data_explorer.git
 
 ### Использование
 ```python
-import data_explorer
-de = data_explorer.DataExplorer(df)
+from data_explorer import DataExplorer
+de = DataExplorer(df)
 ```
 
