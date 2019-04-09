@@ -27,9 +27,9 @@ class DataExplorer():
     @property
     def na(self):
         """Count and percentage of null values for columns that have na"""
-        counts  = self.df.isna().sum()
+        counts  = self.df.isnull().sum()
         counts  = counts[counts > 0]
-        missing = 100 * self.df.isna().mean()
+        missing = 100 * self.df.isnull().mean()
         missing = missing[missing > 0]
         missing = round(missing, 1).sort_values(ascending=False)
         missing = pd.DataFrame([counts, missing]).T
