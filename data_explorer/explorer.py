@@ -26,10 +26,14 @@ class DataExplorer():
 
     @property
     def na(self):
-        """Percentage of null values for columns that have na"""
+        """Count and percentage of null values for columns that have na"""
+        counts  = self.df.isna().sum()
+        counts  = counts[counts > 0]
         missing = 100 * self.df.isna().mean()
         missing = missing[missing > 0]
         missing = round(missing, 1).sort_values(ascending=False)
+        missing = pd.DataFrame([counts, missing]).T
+        missing.columns = ['count', '%']
         return missing
 
 
@@ -71,16 +75,18 @@ class DataExplorer():
         return r
 
 
-    def category(self, upper=10, lower=1, dropna=False):
+    def category(self, upper=10, lower=1, dropna=False, show=True):
         """Count unique values for columns that have {lower} < nunique < {upper}"""
         v = self.df.nunique(dropna=False)
         v = v[(v < upper) & (v > lower)]
         v = v.sort_values(ascending=False)
-        for idx in v.index:
-            d = self.count(col=idx, dropna=dropna)
-            d.index.name = idx
-            display(d)
-            print()
+        if show:
+            for idx in v.index:
+                d = self.count(col=idx, dropna=dropna)
+                d.index.name = idx
+                display(d)
+                print()
+        return v.index
 
 
     def bars(self, column, bins, step=False):
@@ -89,3 +95,13 @@ class DataExplorer():
         if step:
             bins = int((self.df[column].max() - self.df[column].min()) / bins)
         return self.df[column].value_counts(bins=bins, sort=False)
+
+
+    def missing_dates(self, column):
+        """Check if any date is missing between min and max observed values"""
+        col = self.df[column]
+        dates = pd.date_range(col.min(), col.max())
+        present_dates = col.unique()
+        missing = dates[~dates.isin(present_dates)]
+        return missing
+
